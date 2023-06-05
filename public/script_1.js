@@ -1,6 +1,6 @@
 
 
-const socket = new WebSocket('ws://localhost:3000');
+
 
 
 //------------------ variables --------------------------------------
@@ -12,9 +12,7 @@ var flightMarkers = []; // contain all the flight markers
 var currentFLight; // used in second setInterval
 const options = { hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: false }; // format of the time obtained by the local computer
 var radius = 5000; // minimum separation between two planes
-var compArr = []; // array that temporily stores the flight data for collision detection
-var table; //collision-table
-var cell1, cell2, cell3; // cells of the collision table
+
 var allFlights_1 = [];
 var collidedPoints = [];
 
@@ -58,13 +56,6 @@ socket.onmessage = (event) => {
         lng : null,
         m:null,
         c:null,
-        markerName:null,
-        tanvalue:null,
-        count:1,
-        increment:0.05,
-        going : true,
-        departure_time : obj.Departure_Time,
-        marker : null
       };
   });
   
