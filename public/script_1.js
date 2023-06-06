@@ -60,3 +60,18 @@ socket.onmessage = (event) => {
   });
   
 };
+
+let map;
+var intervalId1, intervalId2, intervalId3;
+var waypointList;
+
+function initMap() {
+  // Initialize the map
+  map = new google.maps.Map(document.getElementById("map"), {
+    center: { lat: 1.99702, lng: 106.66321 },
+    zoom: 0,
+    maxZoom: 15,
+    minZoom: 5
+  });
+
+}
