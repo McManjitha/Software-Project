@@ -1,4 +1,18 @@
-
+function createCircle(lt, lg){
+  var circle = new google.maps.Circle({
+    strokeColor: "#FF0000", // Set the stroke color of the circle
+    strokeOpacity: 0.8, // Set the stroke opacity
+    strokeWeight: 2, // Set the stroke weight
+    fillColor: "#FF0000", // Set the fill color of the circle
+    fillOpacity: 0.35, // Set the fill opacity
+    map: map, // Set the map instance
+    center: { lat: lt,  lng: lg }, // Set the center coordinates
+    radius: 20000, // Set the radius in meters
+    visibility : true,
+    count : 0
+  });
+  return circle;
+}
 // calculate the gradient of the straight line path
 function calcGradient(x1, y1, x2, y2){
     var gradient = (y2 - y1)/(x2 - x1);
