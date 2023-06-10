@@ -153,4 +153,62 @@ function initMap() {
     minZoom: 5
   });
 
+  setTimeout(function() {
+    //---------------------------Iniatial assigning-------------------------------
+        for(var i = 0; i < allFlights.length; i++){
+          if(allFlights[i].going){
+    
+            // Finding the waypoints of the first journey
+            firstLabel = allFlights[i].route[0];
+            secondLabel = allFlights[i].route[1];
+    
+            // finding the origin of the airplane
+            firstWaypoint = gateWays.find((obj) => obj.label == firstLabel);
+            secondWaypoint = gateWays.find((obj) => obj.label == secondLabel);
+    
+            // assigning initial and next coordinates 
+            allFlights[i].initLat = firstWaypoint.lat;
+            allFlights[i].initLng = firstWaypoint.lng;
+            allFlights[i].nextLat = secondWaypoint.lat;
+            allFlights[i].nextLng = secondWaypoint.lng;
+            //flightInfo[i].increment = 0.3; // temporily - this should be initialized using the speed.
+    
+            //calculating initial gradient and intercept
+            allFlights[i].m = calcGradient(allFlights[i].initLng, allFlights[i].initLat, allFlights[i].nextLng, allFlights[i].nextLat);
+            allFlights[i].c = calcIntercept(allFlights[i].nextLng, allFlights[i].nextLat, allFlights[i].m);
+    
+            allFlights[i].tanvalue = clacPlaneAngle(allFlights[i].m);
+            allFlights[i].markerName = initalString_2(allFlights[i].initLat, allFlights[i].initLng, allFlights[i].nextLat, allFlights[i].nextLng);
+    
+            // calculating the initail increment
+            if(allFlights[i].initLng > allFlights[i].nextLng){
+              allFlights[i].increment = -1*Math.abs(allFlights[i].increment);
+            }else{
+              allFlights[i].increment = 1*Math.abs(allFlights[i].increment);
+            }
+    
+              // creates the marker of the planes
+            const newMarker = new google.maps.Marker({
+              map: map,
+              position: { lat: allFlights[i].initLat, lng: allFlights[i].initLng },
+              icon : {
+                url: allFlights[i].markerName,
+                scaledSize :  new google.maps.Size(20, 20)
+              },
+              /*label:{                           
+                text : allFlights[i].callsign,      
+                labelVisible : false                
+              },*/
+              setTitle : allFlights[i].callsign
+            });
+            allFlights[i].marker = newMarker;
+    
+            allFlights[i].marker.addListener("click", function(){
+              console.log(this.setTitle);
+            })
+          }
+          
+        }
+      }, 3000);
+
 }
