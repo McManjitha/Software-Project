@@ -29,3 +29,20 @@ mongoose.connect('mongodb://127.0.0.1:27017/FlightSimulator',
 .catch((error) => {
   console.log('Error connecting to MongoDB', error);
 });
+
+const WayPointSchema = new mongoose.Schema({
+  Node_name: {
+    type: String,
+    required: true,
+  },
+  Lat: {
+    type: Number,
+    default: 0,
+  },
+  Lng:{
+    type: Number,
+    default: 0
+  }
+}, { collection: 'WayPoints_100' });
+
+const WayPoint = mongoose.model('WayPoints_100', WayPointSchema);
