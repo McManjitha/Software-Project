@@ -16,6 +16,8 @@ var radius = 5000; // minimum separation between two planes
 var allFlights_1 = [];
 var collidedPoints = [];
 
+
+
 //---------------------------------------------------------------------
 
 socket.onmessage = (event) => {
