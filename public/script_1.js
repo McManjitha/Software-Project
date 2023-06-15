@@ -12,110 +12,20 @@ var flightMarkers = []; // contain all the flight markers
 var currentFLight; // used in second setInterval
 const options = { hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: false }; // format of the time obtained by the local computer
 var radius = 5000; // minimum separation between two planes
+var compArr = []; // array that temporily stores the flight data for collision detection
+var table; //collision-table
+var cell1, cell2, cell3; // cells of the collision table
+var collidedPoints = [];
+let circles = [];
+let blinkTimers = [];
+let count = 0;
+let current_hour;
 
 var allFlights_1 = [];
 var collidedPoints = [];
 
-function firstRequest() {
-  // Get the present hour
-  console.log("Inside sendrequest");
-  const now = new Date();
-  const presentHour = now.getHours();
-  current_hour = presentHour;
-  console.log("current hour = "+current_hour);
-
-  // Calculate the next hour
-  const nextHour = (presentHour + 1) % 24;
-
-  // Create the string in the format "A-B"
-  const data = presentHour + '-' + nextHour;
-
-  // Perform your AJAX request here
-  const xhr = new XMLHttpRequest();
-  const url = '/data?time=' + encodeURIComponent(data); // Include the string as a query parameter
-  xhr.open('GET', url, true);
-  xhr.setRequestHeader('Content-Type', 'application/json');
-
-  xhr.onreadystatechange = function() {
-    if (xhr.readyState === 4 && xhr.status === 200) {
-      allFlights = [];
-      console.log("response recieved");
-      const response = JSON.parse(xhr.responseText);
-      allFlights = response.collection2.map((obj) => {
-        return {
-          callsign: obj.Callsign,
-          route: rearrangeArray(obj.path[0]) ,                //array of waypoints
-          origin: obj.Origin_Info,
-          dest: obj.Destination_Info,
-          routing: obj.Routing,
-          initLat:null,
-          initLng:null,
-          nextLat:null,
-          nextLng:null,
-          lat:null,
-          lng : null,
-          m:null,
-          c:null,
-          markerName:null,
-          tanvalue:null,
-          count:1,
-          increment:0.05,
-          going : true,
-          departure_time : obj.Departure_Time,
-          marker : null
-        };
-    });
-    } else {
-      console.error(xhr.statusText);
-    }
-  };
-  xhr.send();
-}
 
 //---------------------------------------------------------------------
-
-socket.onmessage = (event) => {
-
-  const data = JSON.parse(event.data);
-
-  // Extract the array of objects from collection1
-  const collection1 = data.collection1;
-  const collection2 = data.collection2;
-
-  //console.log("collection 1 = "+collection1);
-
-  // Map the objects in the array to a new array of objects with the desired attributes
-  gateWays = collection1.map((obj) => {
-    return {
-      lat: obj.Lat,
-      lng: obj.Lng,
-      label: obj.Node_name,
-      waypointMarker: null // stores the waypoint marker
-
-    };
-  }); 
-
-
-   // Map the objects in the array to a new array of objects with the desired attributes
-   allFlights = collection2.map((obj) => {
-      return {
-        callsign: obj.Callsign,
-        route: rearrangeArray(obj.path[0]) ,                //array of waypoints
-        origin: obj.Origin_Info,
-        dest: obj.Destination_Info,
-        routing: obj.Routing,
-        initLat:null,
-        initLng:null,
-        nextLat:null,
-        nextLng:null,
-        lat:null,
-        lng : null,
-        m:null,
-        c:null,
-      };
-  });
-  
-};
 
 function firstRequest() {
   // Get the present hour
@@ -196,6 +106,8 @@ function getWaypoints(){
   xhr1.send();
 }
 
+getWaypoints();
+
 function sendRequest() {
   // Get the present hour
   const now = new Date();
@@ -251,6 +163,21 @@ function sendRequest() {
 
   xhr.send();
 }
+
+//initializing the ajax request every hour and 
+function scheduleRequest() {
+  const now = new Date();
+  const nextHour = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours() + 1, 0, 0);
+  const delay = nextHour - now;
+  console.log("Delay = "+delay);
+  firstRequest();
+  setTimeout(() => {
+    console.log("fetching time reached");
+    //sendRequest();
+    setInterval(sendRequest(), 3600000); // Repeat every hour (in milliseconds)
+  }, delay);
+}
+scheduleRequest();
 
 let map;
 var intervalId1, intervalId2, intervalId3;
