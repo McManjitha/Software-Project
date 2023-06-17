@@ -24,22 +24,42 @@ let current_hour;
 var allFlights_1 = [];
 var collidedPoints = [];
 
+function getWaypoints(){
+  const xhr1 = new XMLHttpRequest();
+  xhr1.open('GET', '/wayPoints', true);
+  xhr1.setRequestHeader('Content-Type', 'application/json');
+
+  xhr1.onreadystatechange = function(){
+    if(xhr1.readyState === 4 && xhr1.status === 200){
+      const response = JSON.parse(xhr1.responseText);
+      // Map the objects in the array to a new array of objects with the desired attributes
+      for(let i = 0; i < response.collection1.length; i++){
+        gateWays.push(new WayPoint(response.collection1[i]));
+      }
+    } else {
+      console.error(xhr1.statusText);
+    }
+  }
+  xhr1.send();
+}
+
 
 //---------------------------------------------------------------------
 
 function firstRequest() {
   // Get the present hour
-  console.log("Inside sendrequest");
+  console.log("Inside firstrequest");
   const now = new Date();
   const presentHour = now.getHours();
   current_hour = presentHour;
-  console.log("current hour = "+current_hour);
+  console.log("current hour = "+presentHour);
 
   // Calculate the next hour
   const nextHour = (presentHour + 1) % 24;
+  console.log("next hour = "+nextHour);
 
   // Create the string in the format "A-B"
-  const data = presentHour + '-' + nextHour;
+  const data = current_hour + '-' + nextHour;
 
   // Perform your AJAX request here
   const xhr = new XMLHttpRequest();
@@ -52,30 +72,10 @@ function firstRequest() {
       allFlights = [];
       console.log("response recieved");
       const response = JSON.parse(xhr.responseText);
-      allFlights = response.collection2.map((obj) => {
-        return {
-          callsign: obj.Callsign,
-          route: rearrangeArray(obj.path[0]) ,                //array of waypoints
-          origin: obj.Origin_Info,
-          dest: obj.Destination_Info,
-          routing: obj.Routing,
-          initLat:null,
-          initLng:null,
-          nextLat:null,
-          nextLng:null,
-          lat:null,
-          lng : null,
-          m:null,
-          c:null,
-          markerName:null,
-          tanvalue:null,
-          count:1,
-          increment:0.05,
-          going : true,
-          departure_time : obj.Departure_Time,
-          marker : null
-        };
-    });
+      for(let i = 0; i < response.collection2.length; i++){
+        allFlights.push(new Flight(response.collection2[i]));
+        allFlights[i].initializing();
+      }
     } else {
       console.error(xhr.statusText);
     }
@@ -83,28 +83,6 @@ function firstRequest() {
   xhr.send();
 }
 
-function getWaypoints(){
-  const xhr1 = new XMLHttpRequest();
-  xhr1.open('GET', '/wayPoints', true);
-  xhr1.setRequestHeader('Content-Type', 'application/json');
-  xhr1.onreadystatechange = function(){
-    if(xhr1.readyState === 4 && xhr1.status === 200){
-      const response = JSON.parse(xhr1.responseText);
-      // Map the objects in the array to a new array of objects with the desired attributes
-      gateWays = response.collection1.map((obj) => {
-        return {
-          lat: obj.Lat,
-          lng: obj.Lng,
-          label: obj.Node_name,
-          waypointMarker: null // stores the waypoint marker
-        };
-      });
-    } else {
-      console.error(xhr1.statusText);
-    }
-  }
-  xhr1.send();
-}
 
 getWaypoints();
 
