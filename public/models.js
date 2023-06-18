@@ -21,6 +21,7 @@ class Flight{
         this.going = true;
         this.departure_time = obj.Departure_Time;
         this.marker = null;
+        //this.elevation = obj.elevation;
     }
 
     rearrangeArray(inputString){
@@ -65,7 +66,6 @@ class Flight{
         this.initLng = firstWaypoint.lng;
         this.nextLat = secondWaypoint.lat;
         this.nextLng = secondWaypoint.lng;
-        //flightInfo[i].increment = 0.3; // temporily - this should be initialized using the speed.
         //calculating initial gradient and intercept
         this.m = calcGradient( this.initLng,  this.initLat,  this.nextLng,  this.nextLat);
         this.c = calcIntercept( this.nextLng,  this.nextLat,  this.m);
@@ -85,6 +85,90 @@ class Flight{
             console.log(this.setTitle);
         })
     }
+
+    incrementing(){
+        this.lng = this.marker.getPosition().lng() + this.increment;
+        this.lat =  this.lng* this.m +  this.c;
+        this.marker.setPosition({lat: this.lat, lng: this.lng});
+    }
+
+    waypointChanging_down(index){
+        if(this.isDestinationReached(index)){
+            return;
+        }
+        this.initLat =  this.nextLat;
+        this.initLng = this.nextLng;
+        let temp1 = gateWays.find((obj) => obj.label == this.route[this.count]);
+        this.nextLat = temp1.lat;
+        this.nextLng = temp1.lng;
+        this.m = calcGradient(this.initLng, this.initLat,this.nextLng, this.nextLat)
+        this.c = calcIntercept(this.nextLng, this.nextLat, this.m);
+        this.tanvalue = clacPlaneAngle(this.m);
+        if(this.initLat > this.nextLat){
+            this.tanvalue = this.tanvalue + 180;
+        }
+        this.markerName = makeImageString(this.tanvalue-40);
+        let icon = {
+            url: this.markerName,
+            scaledSize: new google.maps.Size(20, 20)
+        };
+        this.marker.setIcon(icon);
+        if(this.initLng > this.nextLng){
+            this.increment = -1*Math.abs(this.increment);
+        }else{
+            this.increment = Math.abs(this.increment);
+        }
+
+    }
+
+    isDestinationReached(index){
+        this.count = this.count + 1;
+        if(this.count >= this.route.length){
+            this.marker.setPosition({lat : this.nextLat, lng : this.nextLng});
+            this.going = false;
+            flightInfo.splice(index, 1);
+            return 1;
+        }
+        return 0;
+    }
+
+    waypointChanging_up(index){
+        if(this.isDestinationReached(index)){
+            return;
+        }
+        this.initLat =  this.nextLat;
+        this.initLng =this.nextLng;
+        // plane stopping
+        var temp2 = gateWays.find((obj) => obj.label == this.route[this.count]);
+
+        this.nextLat = temp2.lat;
+        this.nextLng = temp2.lng;
+
+        // calculate the new gradient and intercept of the next journey
+        this.m = calcGradient(this.initLng, this.initLat,this.nextLng, this.nextLat)
+        this.c = calcIntercept(this.nextLng, this.nextLat, this.m);
+
+        this.tanvalue = clacPlaneAngle(this.m);
+        //console.log('tanvalue = '+flightInfo[k].tanvalue);
+        
+        if(this.initLat >  this.nextLat){
+            this.tanvalue = this.tanvalue + 180;
+        }
+        this.markerName = makeImageString(this.tanvalue-40);
+
+        let icon = {
+            url: this.markerName,
+            scaledSize: new google.maps.Size(20, 20)
+        };
+        this.marker.setIcon(icon);
+        // selecting the right increment whether negative or positive
+        if(this.initLng > this.nextLng){
+            this.increment = -1*Math.abs(this.increment);
+        }else{
+            this.increment = Math.abs(this.increment);
+        }
+    }
+
 }
 
 class WayPoint{
