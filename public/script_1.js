@@ -88,14 +88,18 @@ getWaypoints();
 
 function sendRequest() {
   // Get the present hour
-  const now = new Date();
-  const presentHour = now.getHours();
+  console.log("Inside sendrequest");
+  current_hour++;
+  console.log("current hour = "+current_hour);
+  console.log("test");
 
   // Calculate the next hour
-  const nextHour = (presentHour + 1) % 24;
+  const nextHour = (current_hour + 1) % 24;
+  console.log("Next hour = "+nextHour);
 
   // Create the string in the format "A-B"
-  const data = presentHour + '-' + nextHour;
+  const data = current_hour + '-' + nextHour;
+  current_hour = nextHour;
 
   // Perform your AJAX request here
   const xhr = new XMLHttpRequest();
@@ -105,42 +109,20 @@ function sendRequest() {
 
   xhr.onreadystatechange = function() {
     if (xhr.readyState === 4 && xhr.status === 200) {
+      allFlights = [];
+      console.log("response recieved");
       const response = JSON.parse(xhr.responseText);
-      // Handle the response data
-      console.log('response = ');
-      console.log(response.collection2);
-      //console.log("response length = "+response.collection3.length);
-      allFlights = response.collection2.map((obj) => {
-        return {
-          callsign: obj.Callsign,
-          route: rearrangeArray(obj.path[0]) ,                //array of waypoints
-          origin: obj.Origin_Info,
-          dest: obj.Destination_Info,
-          routing: obj.Routing,
-          initLat:null,
-          initLng:null,
-          nextLat:null,
-          nextLng:null,
-          lat:null,
-          lng : null,
-          m:null,
-          c:null,
-          markerName:null,
-          tanvalue:null,
-          count:1,
-          increment:0.05,
-          going : true,
-          departure_time : obj.Departure_Time,
-          marker : null
-        };
-    });
+      for(let i = 0; i < response.collection2.length; i++){
+        allFlights.push(new Flight(response.collection2[i]));
+        allFlights[i].initializing();
+      }
     } else {
       console.error(xhr.statusText);
     }
   };
-
   xhr.send();
 }
+
 
 //initializing the ajax request every hour and 
 function scheduleRequest() {
