@@ -133,7 +133,7 @@ function scheduleRequest() {
   firstRequest();
   setTimeout(() => {
     console.log("fetching time reached");
-    //sendRequest();
+    sendRequest();
     setInterval(sendRequest(), 3600000); // Repeat every hour (in milliseconds)
   }, delay);
 }
@@ -142,6 +142,75 @@ scheduleRequest();
 let map;
 var intervalId1, intervalId2, intervalId3;
 var waypointList;
+
+function main(){
+  getWaypoints();
+  scheduleRequest();
+  let obj = 
+  {
+    _id: {
+      "$oid": "6476d9942517827c1111301c"
+    },
+    Callsign: "MI320",
+    Departure_Time: "10.00.00",
+    Destination_Info: "WMKK",
+    Origin_Info: "WSSS",
+    Routing: "WSSS_WMKK",
+    path: ["[WSSS, VTK ,VJR,GUPTA,VKL,WMKK]"],
+    Altitude : ["[12000,41000,41000,41000,41000,7000]"]
+  }
+  
+  let obj2 = 
+  {
+    "_id": {
+      "$oid": "6476d9942517827c11113047"
+    },
+    "Callsign": "MH3381",
+    "Departure_Time": "10.00.00",
+    "Destination Info": "WBGG",
+    "Origin Info": "WBGB",
+    "Routing": "WBGB_WBGG",
+    "path": ["[WBGB,VBU,VSI,VKG,WBGG]"],
+    "Altitude" : ["[12000,41000,41000,41000,41000,7000]"]
+  }
+
+  let obj3 =
+  {
+    "_id": {
+      "$oid": "6476d9942517827c11113055"
+    },
+    "Callsign": "AK6056",
+    "Departure_Time": "10.00.00",
+    "Destination Info": "WBGB",
+    "Origin Info": "WBGG",
+    "Routing": "WBGG_WBGB",
+    "path": ["[WBGG,VKG,VSI,ADGAB,VBU,WBGB]"],
+    "Altitude" : ["[12000,41000,41000,41000,41000,7000]"]
+  }
+
+  // pushing flights to the flightinfo array for the simulation - flightinfo contains the flights that fly
+  intervalId2 = setInterval(function() {
+    //console.log('flightInfo = '+flightInfo);
+    for(let m = 0; m < allFlights.length; m++){
+      if(compareTime(allFlights[m].departure_time, allFlights[m].callsign)){ 
+        console.log("inside time");
+        //console.log(allFlights[m].altitude[0]);
+        if(allFlights[m].altitude[0] == '7000'){
+          flightInfo[0].push(allFlights[m]);
+        }
+        else if(allFlights[m].altitude[0] == '12000') {
+          //console.log("Done");
+          flightInfo[1].push(allFlights[m]);
+        }
+        
+        allFlights.splice(m, 1);
+        m--;
+      }
+    }
+    console.log("flightInfo = ");
+    console.log(flightInfo);
+  }, 7000);
+}
 
 function initMap() {
   // Initialize the map
