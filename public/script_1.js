@@ -234,6 +234,49 @@ function main(){
   }, 7000);
 }
 
+function collisionHandling(){
+  //console.log('Inside collisionHandling');
+  //console.log(compArr);
+  for(let j = 0; j < compArr.length; j++){
+    //let j = 1;
+    for(let p = 0; p < compArr[j].length; p++){
+      //console.log('collision');
+      for(let pInner = 0; pInner < compArr[j].length; pInner++){
+        if(p == pInner){
+          continue;
+        }
+        let distance = google.maps.geometry.spherical.computeDistanceBetween(compArr[j][p].marker.position, compArr[j][pInner].marker.position);
+        if (distance < radius) {
+  
+          blinkCircle(compArr[j][p].marker.position.lat(), compArr[j][p].marker.position.lng());
+          const localDate = new Date();
+          const localHours = localDate.getHours();
+          const localMinutes = localDate.getMinutes();
+          const localSeconds = localDate.getSeconds();
+          // markers are colliding
+          //console.log(compArr[p].callsign+' colllides with '+compArr[pInner].callsign);
+          table = document.getElementById('collision-table');
+          // Create a new row for the table
+          var newRow = table.insertRow();
+          cell1 = newRow.insertCell(0);
+          cell2 = newRow.insertCell(1);
+          cell3 = newRow.insertCell(2);
+          cell4 = newRow.insertCell(3);
+          cell5 = newRow.insertCell(4);
+          // Populate the cells with the data for the new record
+          cell1.innerHTML = compArr[j][p].callsign;
+          cell2.innerHTML = compArr[j][pInner].callsign;
+          cell3.innerHTML = localHours+":"+localMinutes+":"+localSeconds;
+          cell4.innerHTML = compArr[j][p].lat;
+          cell5.innerHTML = compArr[j][p].lng;
+          //compArr[j].splice(pInner, 1);
+          //pInner--;
+        } 
+      }
+    }
+  }
+}
+
 function initMap() {
   // Initialize the map
   map = new google.maps.Map(document.getElementById("map"), {
