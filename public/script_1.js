@@ -1,8 +1,4 @@
 
-
-
-
-
 //------------------ variables --------------------------------------
 var gateWays = []; // contain waypoints
 var allFlights = [];
@@ -121,6 +117,32 @@ function sendRequest() {
     }
   };
   xhr.send();
+}
+
+function getAltitudes(){
+  return new Promise(function(resolve, reject) {
+    const xhr2 = new XMLHttpRequest();
+    xhr2.open('GET', '/altitudes', true);
+    xhr2.setRequestHeader('Content-Type', 'application/json');
+
+    xhr2.onreadystatechange = function(){
+      if(xhr2.readyState === 4 && xhr2.status === 200){
+        const altitudes = JSON.parse(xhr2.responseText);
+        altitudesArr[0] = rearrangeArray(altitudes.TakeOff_levels);
+        altitudesArr[1] = rearrangeArray(altitudes.Cruise_Levels);
+        altitudesArr[2] = rearrangeArray(altitudes.Decent_levels);
+        
+        uniqueAltitudes = flattenAndRemoveDuplicates(altitudesArr);
+        console.log("uniqueAltitudes");
+        console.log(uniqueAltitudes);
+        resolve();
+        
+      }else{
+        console.error(xhr2.status);
+      }
+    }
+    xhr2.send();
+  });
 }
 
 
