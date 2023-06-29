@@ -70,6 +70,8 @@ function firstRequest() {
       allFlights = [];
       console.log("response recieved");
       const response = JSON.parse(xhr.responseText);
+      //console.log(response.collection2);
+
       for(let i = 0; i < response.collection2.length; i++){
         allFlights.push(new Flight(response.collection2[i]));
         allFlights[i].initializing();
@@ -80,7 +82,6 @@ function firstRequest() {
   };
   xhr.send();
 }
-
 
 getWaypoints();
 
@@ -170,47 +171,6 @@ var waypointList;
 function main(){
   getWaypoints();
   scheduleRequest();
-  let obj = 
-  {
-    _id: {
-      "$oid": "6476d9942517827c1111301c"
-    },
-    Callsign: "MI320",
-    Departure_Time: "10.00.00",
-    Destination_Info: "WMKK",
-    Origin_Info: "WSSS",
-    Routing: "WSSS_WMKK",
-    path: ["[WSSS, VTK ,VJR,GUPTA,VKL,WMKK]"],
-    Altitude : ["[12000,41000,41000,41000,41000,7000]"]
-  }
-  
-  let obj2 = 
-  {
-    "_id": {
-      "$oid": "6476d9942517827c11113047"
-    },
-    "Callsign": "MH3381",
-    "Departure_Time": "10.00.00",
-    "Destination Info": "WBGG",
-    "Origin Info": "WBGB",
-    "Routing": "WBGB_WBGG",
-    "path": ["[WBGB,VBU,VSI,VKG,WBGG]"],
-    "Altitude" : ["[12000,41000,41000,41000,41000,7000]"]
-  }
-
-  let obj3 =
-  {
-    "_id": {
-      "$oid": "6476d9942517827c11113055"
-    },
-    "Callsign": "AK6056",
-    "Departure_Time": "10.00.00",
-    "Destination Info": "WBGB",
-    "Origin Info": "WBGG",
-    "Routing": "WBGG_WBGB",
-    "path": ["[WBGG,VKG,VSI,ADGAB,VBU,WBGB]"],
-    "Altitude" : ["[12000,41000,41000,41000,41000,7000]"]
-  }
 
   // pushing flights to the flightinfo array for the simulation - flightinfo contains the flights that fly
   intervalId2 = setInterval(function() {
@@ -237,20 +197,20 @@ function main(){
 }
 
 function collisionHandling(){
-  //console.log('Inside collisionHandling');
+  console.log('Inside collisionHandling');
   //console.log(compArr);
   for(let j = 0; j < compArr.length; j++){
-    //let j = 1;
-    for(let p = 0; p < compArr[j].length; p++){
-      //console.log('collision');
-      for(let pInner = 0; pInner < compArr[j].length; pInner++){
-        if(p == pInner){
-          continue;
-        }
-        let distance = google.maps.geometry.spherical.computeDistanceBetween(compArr[j][p].marker.position, compArr[j][pInner].marker.position);
+    //console.log("Inside for loop");
+    //console.log(compArr[j]);
+    while(compArr[j].length > 0){
+      let ob1 = compArr[j].shift();
+      //console.log(ob1);
+
+      for(let k = 0; k < compArr[j].length; k++){
+        let distance = google.maps.geometry.spherical.computeDistanceBetween(ob1.marker.position, compArr[j][k].marker.position);
         if (distance < radius) {
-  
-          blinkCircle(compArr[j][p].marker.position.lat(), compArr[j][p].marker.position.lng());
+
+          blinkCircle(ob1.marker.position.lat(), ob1.marker.position.lng());
           const localDate = new Date();
           const localHours = localDate.getHours();
           const localMinutes = localDate.getMinutes();
@@ -266,16 +226,26 @@ function collisionHandling(){
           cell4 = newRow.insertCell(3);
           cell5 = newRow.insertCell(4);
           // Populate the cells with the data for the new record
-          cell1.innerHTML = compArr[j][p].callsign;
-          cell2.innerHTML = compArr[j][pInner].callsign;
+          cell1.innerHTML = ob1.callsign;
+          cell2.innerHTML = compArr[j][k].callsign;
           cell3.innerHTML = localHours+":"+localMinutes+":"+localSeconds;
-          cell4.innerHTML = compArr[j][p].lat;
-          cell5.innerHTML = compArr[j][p].lng;
-          //compArr[j].splice(pInner, 1);
-          //pInner--;
+          cell4.innerHTML = ob1.lat;
+          cell5.innerHTML = ob1.lng;
         } 
       }
     }
+  }
+}
+
+async function namingflightInfo(){
+  try{
+    await getAltitudes();
+    for(let i = 0; i < uniqueAltitudes.length; i++){
+      flightInfo.push([]);
+      namingObject[uniqueAltitudes[i]] = i;
+    }
+  }catch(error){
+    console.error(error);
   }
 }
 
@@ -287,6 +257,7 @@ function initMap() {
     maxZoom: 15,
     minZoom: 5
   });
+
 
   setTimeout(function() {
     //---------------------------Iniatial assigning-------------------------------
