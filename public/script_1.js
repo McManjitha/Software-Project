@@ -2,7 +2,7 @@
 //------------------ variables --------------------------------------
 var gateWays = []; // contain waypoints
 var allFlights = [];
-var flightInfo = []; // contain information about flights
+var flightInfo = [[], []]; // contain information about flights
 var firstWaypoint, secondWaypoint, firstLabel, secondLabel;
 var flightMarkers = []; // contain all the flight markers
 var currentFLight; // used in second setInterval
@@ -16,9 +16,11 @@ let circles = [];
 let blinkTimers = [];
 let count = 0;
 let current_hour;
-
-var allFlights_1 = [];
-var collidedPoints = [];
+var intervalId1, intervalId2, intervalId3;
+var waypointList;
+var altitudesArr = [[], [], []];
+let uniqueAltitudes = [];
+let namingObject = {};// contains the naming of the flightInfo array rows
 
 function getWaypoints(){
   const xhr1 = new XMLHttpRequest();
