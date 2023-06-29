@@ -237,6 +237,17 @@ function collisionHandling(){
   }
 }
 
+async function namingflightInfo(){
+  try{
+    await getAltitudes();
+    for(let i = 0; i < uniqueAltitudes.length; i++){
+      flightInfo.push([]);
+      namingObject[uniqueAltitudes[i]] = i;
+    }
+  }catch(error){
+    console.error(error);
+  }
+}
 
 function initMap() {
   // Initialize the map
@@ -246,6 +257,7 @@ function initMap() {
     maxZoom: 15,
     minZoom: 5
   });
+
 
   setTimeout(function() {
     //---------------------------Iniatial assigning-------------------------------
