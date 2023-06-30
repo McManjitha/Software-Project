@@ -1,6 +1,5 @@
 class Flight{
     constructor(obj){
-        console.log("cons");
         this.callsign = obj.Callsign;
         this.route = rearrangeArray(obj.path[0]);
         this.origin = obj.Origin_Info;
@@ -17,11 +16,12 @@ class Flight{
         this.markerName = null;
         this.tanvalue = null;
         this.count = 1;
-        this.increment = 0.05;
+        this.increment = 0.06;
         this.going = true;
         this.departure_time = obj.Departure_Time;
         this.marker = null;
-        //this.elevation = obj.elevation;
+        this.altitude = rearrangeArray(obj.Altitude[0]);
+        this.currentAltitude = this.altitude[0];
     }
 
     rearrangeArray(inputString){
@@ -92,8 +92,9 @@ class Flight{
         this.marker.setPosition({lat: this.lat, lng: this.lng});
     }
 
-    waypointChanging_down(index){
-        if(this.isDestinationReached(index)){
+    waypointChanging_down(j, k){
+        //console.log("inside down");
+        if(this.isDestinationReached(j, k)){
             return;
         }
         this.initLat =  this.nextLat;
@@ -118,22 +119,34 @@ class Flight{
         }else{
             this.increment = Math.abs(this.increment);
         }
-
     }
 
-    isDestinationReached(index){
+    isDestinationReached(j, k){
+        //console.log("inside reached");
         this.count = this.count + 1;
+        let prevAltitude = this.currentAltitude;
+        this.currentAltitude = this.altitude[count-1];
+        
+        //console.log("coutn = "+this.count);
         if(this.count >= this.route.length){
+            //console.log("End reached");
             this.marker.setPosition({lat : this.nextLat, lng : this.nextLng});
             this.going = false;
-            flightInfo.splice(index, 1);
+            try{
+                flightInfo[j].splice(k, 1);
+            }catch(error){
+                console.log(error);
+                console.log('callsign = '+this.callsign);
+                console.log('j = '+j);
+                console.log('k = '+k);
+            }
             return 1;
         }
         return 0;
     }
 
-    waypointChanging_up(index){
-        if(this.isDestinationReached(index)){
+    waypointChanging_up(j, k){
+        if(this.isDestinationReached(j, k)){
             return;
         }
         this.initLat =  this.nextLat;
