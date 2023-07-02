@@ -21,6 +21,9 @@ var waypointList;
 var altitudesArr = [[], [], []];
 let uniqueAltitudes = [];
 let namingObject = {};// contains the naming of the flightInfo array rows
+var intervalId1, intervalId2, intervalId3;
+let map;
+
 
 function getWaypoints(){
   const xhr1 = new XMLHttpRequest();
@@ -164,35 +167,46 @@ function scheduleRequest() {
 }
 scheduleRequest();
 
-let map;
-var intervalId1, intervalId2, intervalId3;
-var waypointList;
 
 function main(){
   getWaypoints();
   scheduleRequest();
+  namingflightInfo();
+
+  setTimeout(function() {
+    for(var gws = 0; gws < gateWays.length; gws++){
+      console.log("Creating waypoints");
+      gateWays[gws].waypointMarker = createMarker(gateWays[gws]);
+      gateWays[gws].waypointMarker.addListener("click", function(){
+        console.log(this.setTitle);
+      })
+    }
+  }, 3000)
+
 
   // pushing flights to the flightinfo array for the simulation - flightinfo contains the flights that fly
   intervalId2 = setInterval(function() {
     //console.log('flightInfo = '+flightInfo);
     for(let m = 0; m < allFlights.length; m++){
       if(compareTime(allFlights[m].departure_time, allFlights[m].callsign)){ 
-        console.log("inside time");
-        //console.log(allFlights[m].altitude[0]);
-        if(allFlights[m].altitude[0] == '7000'){
-          flightInfo[0].push(allFlights[m]);
+        for(let j = 0; j < altitudesArr[0].length; j++){
+          //console.log("the flight");
+          //console.log(allFlights[m]);
+          if((allFlights.length > 0) && (allFlights[m].currentAltitude == altitudesArr[0][j])){
+            flightInfo[namingObject[altitudesArr[0][j]]].push(allFlights[m]);
+            allFlights.splice(m, 1);
+            m--;
+          }
         }
-        else if(allFlights[m].altitude[0] == '12000') {
-          //console.log("Done");
-          flightInfo[1].push(allFlights[m]);
-        }
-        
-        allFlights.splice(m, 1);
-        m--;
       }
     }
+    //console.log("allFlights = ");
+    //console.log(allFlights);
+
     console.log("flightInfo = ");
     console.log(flightInfo);
+    
+
   }, 7000);
 }
 
