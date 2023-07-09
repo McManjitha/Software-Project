@@ -21,18 +21,71 @@ const LogInSchema = new mongoose.Schema({
 });
 
 const PlaneSchema = new mongoose.Schema({
-  name: {
+  id: {
     type: String,
-    required: true,
+    required:false,
   },
-  email: {
+  Callsign: {
     type: String,
-    required: true,
+    required: false,
   },
-  age: {
+  Departure_Time: {
     type: String,
-    required: true,
+    required: false,
   },
+  Destination_Info: {
+    type: String,
+    required: false,
+  },
+  Origin_Info: {
+    type: String,
+    required: false,
+  },
+  Origin: {
+    type: String,
+    required:false,
+  },
+  Dest: {
+    type: String,
+    required: false,
+  },
+  Routing: {
+    type: String,
+    required: false,
+  },
+  Aircraft_Type: {
+    type: String,
+    required:false,
+  },
+  Cruise_Speed: {
+    type: String,
+    required:false,
+  },
+  Max_Ceiling: {
+    type: String,
+    required: false,
+  },
+  Default_RFL: {
+    type: String,
+    required: false,
+  },
+  Time_Duration: {
+    type: String,
+    required:false,
+  },
+  Schedule_Arrival_Time: {
+    type: String,
+    required: false,
+  },
+  path: {
+    type: String,
+    required: false,
+  },
+  Altitude: {
+    type: String,
+    required: false,
+  },
+
 });
 
 const RouteSchema = new mongoose.Schema({
@@ -50,16 +103,30 @@ const RouteSchema = new mongoose.Schema({
   },
 });
 
-const WaypointSchema = new mongoose.Schema({
-  waypointname: {
+const WaypointsSchema = new mongoose.Schema({
+  Node_name: {
     type: String,
     required: true,
   },
-  location1: {
+  Lat: {
     type: String,
     required: true,
   },
-  location2: {
+  Lng: {
+    type: String,
+    required: true,
+  },
+});
+const AltitudesSchema = new mongoose.Schema({
+  TakeOff_levels: {
+    type: String,
+    required: true,
+  },
+  Cruise_Levels: {
+    type: String,
+    required: true,
+  },
+  Decent_levels: {
     type: String,
     required: true,
   },
@@ -68,11 +135,13 @@ const WaypointSchema = new mongoose.Schema({
 const LogInCollection = mongoose.model("LogInCollection", LogInSchema);
 const PlaneCollection = mongoose.model("PlaneCollection", PlaneSchema);
 const RouteCollection = mongoose.model("RouteCollection", RouteSchema);
-const WaypointCollection = mongoose.model("WaypointCollection", WaypointSchema);
+const WaypointCollection = mongoose.model("WaypointCollection", WaypointsSchema);
+const AltitudeCollection = mongoose.model("AltitudeCollection", AltitudesSchema);
 
 module.exports = {
   LogInCollection,
   PlaneCollection,
   RouteCollection,
   WaypointCollection,
+  AltitudeCollection,
 };
