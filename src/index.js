@@ -3,7 +3,7 @@ const multer = require("multer");
 const csv = require("csv-parser");
 const fs = require("fs");
 const path = require("path");
-const { LogInCollection, PlaneCollection, RouteCollection, WaypointCollection } = require("./mongodb");
+const { LogInCollection, PlaneCollection, RouteCollection, AltitudeCollection,WaypointCollection } = require("./mongodb");
 
 const app = express();
 const upload = multer({ dest: "uploads/" });
@@ -63,6 +63,7 @@ app.post("/login", async (req, res) => {
 app.post("/upload", upload.fields([
   { name: "planes", maxCount: 1 },
   { name: "routes", maxCount: 1 },
+  { name: "altitudes", maxCount: 1 },
   { name: "waypoints", maxCount: 1 }
 ]), async (req, res) => {
   if (!req.files || Object.keys(req.files).length === 0) {
@@ -74,6 +75,7 @@ app.post("/upload", upload.fields([
     // Clear existing collections
     await PlaneCollection.deleteMany({});
     await RouteCollection.deleteMany({});
+    await AltitudeCollection.deleteMany({});
     await WaypointCollection.deleteMany({});
 
     const files = req.files;
@@ -110,6 +112,9 @@ app.post("/upload", upload.fields([
           break;
         case "waypoints":
           await WaypointCollection.insertMany(results);
+          break;
+        case "altitudes":
+          await AltitudeCollection.insertMany(results);
           break;
       }
     }
